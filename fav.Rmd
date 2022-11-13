@@ -1,5 +1,5 @@
 ---
-title: First Analysis
+title: Favorites Analysis
 
 ---
 
@@ -9,52 +9,56 @@ library(tidyverse)
 library(googlesheets4)
 library(stringr)
 Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
-freq_trails = read_sheet(Sheet, sheet="frequented_trails")
-freq_trails %>% colnames()
+fav_trails = read_sheet(Sheet, sheet="favorite_trails")
+fav_trails %>% colnames()
+
 ```
 
 ```{r}
 activity_levels = c("Beginner","Intermediate","Advanced")
-cleaned_freq_trails <-
-freq_trails %>%
+cleaned_fav_trails <-
+fav_trails %>%
 mutate(
     season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
     activity = as_factor(activity),
         level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
         level = factor(level, activity_levels))
+
 ```
 
 ```{r}
-cleaned_freq_trails %>% 
-ggplot()+geom_bar(aes(y=fct_infreq(most_frequented_trail)))+ggtitle("Overall Trail Usage")
+cleaned_fav_trails %>% 
+ggplot()+geom_bar(aes(y=fct_infreq(favorite_trail)))+ggtitle("Overall Favorite Trails")
 ```
+
 ```{r}
-library(ggplot2)
-cleaned_freq_trails %>%
+cleaned_fav_trails %>%
 distinct(timestamp, activity) %>%
 ggplot() + geom_bar(aes(y=activity))
 
-a=1
-
-
+cleaned_fav_trails %>%
+distinct(activity, level) %>%
+group_by(activity, level) %>%
+count()
 
 ```
 
-cleaned_freq_trails %>%
-group_by(activity, level) %>%
-distinct() %>%
-count()
-
-cleaned_freq_trails %>%
+```{r}
+cleaned_fav_trails %>%
 distinct(timestamp, activity, level) %>%
 ggplot() + geom_bar(aes(y=activity)) + facet_wrap(~level)
+```
 
-cleaned_freq_trails %>%
+```{r}
+cleaned_fav_trails %>%
 filter(season == "summer", level != "Beginner", activity != "hiking") %>%
-ggplot() + geom_bar(aes(y=fct_infreq(most_frequented_trail))) +
+ggplot() + geom_bar(aes(y=fct_infreq(favorite_trail))) +
     facet_grid(rows=vars(activity), cols=vars(level))
+```
 
-cleaned_freq_trails %>%
+```{r}
+cleaned_fav_trails %>%
 filter(season == "summer", level != "Beginner", activity == "hiking") %>%
-ggplot() + geom_bar(aes(y=fct_infreq(most_frequented_trail))) +
+ggplot() + geom_bar(aes(y=fct_infreq(favorite_trail))) +
     facet_grid(rows=vars(activity), cols=vars(level))
+```

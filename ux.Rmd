@@ -1,0 +1,63 @@
+---
+title: User Experience Analysis
+editor:
+  render-on-save: true
+---
+
+
+```{r}
+library(tidyverse)
+library(googlesheets4)
+library(stringr)
+Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
+experiences = read_sheet(Sheet, sheet="trail_experiences")
+experiences %>% colnames()
+
+```
+
+```{r}
+activity_levels = c("Beginner","Intermediate","Advanced")
+cleaned_experiences <-
+experiences %>%
+mutate(
+    season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
+    activity = as_factor(activity),
+        level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
+        level = factor(level, activity_levels))
+
+```
+
+```{r}
+ggplot(cleaned_experiences)+
+geom_bar(aes(x=experience), stat="count")
+
+```
+
+```{r}
+ggplot(cleaned_experiences)+
+geom_bar(aes(x=trail, fill=experience), stat='count', position='dodge')+
+theme(axis.text.x = element_text(angle=90, hjust=1, vjust=.5))+
+scale_fill_brewer(palette = "Set1")
+
+```
+
+# Which experiences are most represented? 
+
+```{r, results='asis'}
+cleaned_experiences %>%
+group_by(activity, level, trail) %>%
+count(experience) %>%
+group_by(experience) %>%
+summarise(
+    max_n = max(n)
+) %>% knitr::kable()
+```
+
+```{r}
+cleaned_experiences %>%
+group_by(activity, level, trail) %>%
+count(experience) %>%
+group_by(activity, level, experience) %>%
+summarise( max_n = max(n)) %>%
+ggplot() + geom_bar(aes(x=interaction(activity, level), y=max_n, fill=experience), position='dodge', stat='identity')+ scale_fill_brewer(palette="Set1")+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=.5))
+```

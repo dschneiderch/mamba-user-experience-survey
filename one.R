@@ -28,7 +28,7 @@ colnames(sheet1) <- clean_colnames
 
 sheet1
 
-% favorite 
+# favorite 
 
 fav = sheet1 %>% select(timestamp, activity, level, contains("favorite"))
 fav
@@ -42,7 +42,7 @@ fav_long
 
 sheet_write(fav_long, ss=Sheet, sheet="favorite_trails")
 
-% frequency
+# frequency
 
 freq = sheet1 %>% select(timestamp, activity, level, contains("most_frequented"), "why_most_frequented")
 freq_long = freq  %>%
@@ -54,13 +54,13 @@ freq_long
 
 sheet_write(freq_long, ss=Sheet, sheet="frequented_trails")
 
-% experiences
+# experiences
 
 exp = sheet1 %>% select(timestamp, activity, level, contains("experience"))
 exp_long = exp %>%
 pivot_longer(contains("experience"), names_to='trail', names_prefix="experience-", values_to='experience') %>%
 filter(!is.na(experience)) %>%
-separate_rows(experience)
+separate_rows(experience, sep=",")
 exp_long
 
 sheet_write(exp_long, ss=Sheet, sheet="trail_experiences")
