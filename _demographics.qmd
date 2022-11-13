@@ -1,0 +1,70 @@
+---
+title: Survey takers demographics
+format:
+  html:
+    code-fold: true
+editor:
+  render-on-save: false
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+#| cache: true
+#| output: false
+library(tidyverse)
+library(googlesheets4)
+library(stringr)
+gs4_auth(email="dschneid@gmail.com")
+Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
+responses = read_sheet(Sheet, sheet="responses-clean_colnames")
+
+```
+
+# Who took the survey?
+
+Number of participants
+
+```{r}
+responses %>%
+distinct(timestamp) %>%
+count()
+```
+
+```{r}
+responses %>%
+select(timestamp, activity, level) %>%
+ggplot()+
+geom_bar(aes(x=activity, fill=activity),width=1)+
+ggtitle('Count Surveyees by Activity')
+```
+
+
+```{r}
+responses %>%
+select(timestamp, activity, level) %>%
+ggplot()+
+geom_bar(aes(x=level, fill=level),width=1)+
+ggtitle('Count Surveyees by Level')
+```
+
+```{r}
+#| fig-cap: Count by activity and level
+responses %>%
+select(timestamp, activity, level) %>%
+ggplot()+
+geom_bar(aes(x=activity, fill=level), position='dodge')+
+scale_fill_brewer(palette="Set3") +
+ggtitle("Count by activity and level")
+```
+
+# What trails are represented?
+
+```{r}
+all_trailnames = responses %>%
+select(contains("favorite-")) %>%
+colnames() %>%
+str_replace("favorite-","")
+```

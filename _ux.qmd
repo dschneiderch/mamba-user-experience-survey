@@ -5,17 +5,18 @@ editor:
 ---
 
 
-```{r}
-library(tidyverse)
+```{r, cache=TRUE}
+suppressPackageStartupMessages(library(tidyverse))
 library(googlesheets4)
 library(stringr)
+gs4_auth(email="dschneid@gmail.com")
 Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
 experiences = read_sheet(Sheet, sheet="trail_experiences")
-experiences %>% colnames()
+
 
 ```
 
-```{r}
+```{r, include=FALSE}
 activity_levels = c("Beginner","Intermediate","Advanced")
 cleaned_experiences <-
 experiences %>%
@@ -27,9 +28,30 @@ mutate(
 
 ```
 
+
+```{r eval=FALSE}
+num_users <- cleaned_experiences %>%
+distinct(timestamp) %>%
+count()
+num_trails <- cleaned_experiences %>%
+  distinct(trail)
+
+num_trails$trail
+
+all_trailnames[!all_trailnames %in% num_trails$trail]
+
+
+```
+
+# Which experience is most represented?
+
 ```{r}
 ggplot(cleaned_experiences)+
-geom_bar(aes(x=experience), stat="count")
+geom_bar(aes(x=experience), stat="count")+
+ggtitle('Count of experiences')
+```
+
+```{r}
 
 ```
 
@@ -41,16 +63,35 @@ scale_fill_brewer(palette = "Set1")
 
 ```
 
-# Which experiences are most represented? 
+# Which experiences are most represented?
 
 ```{r, results='asis'}
-cleaned_experiences %>%
+top_experiences = cleaned_experiences %>%
 group_by(activity, level, trail) %>%
 count(experience) %>%
 group_by(experience) %>%
 summarise(
     max_n = max(n)
-) %>% knitr::kable()
+) %>%
+slice_max(prop=.5, order_by=max_n)
+
+top_experiences %>% knitr::kable()
+```
+
+```{r}
+cleaned_experiences %>%
+inner_join(top_experiences) %>%
+group_by(activity, trail) %>%
+count(experience) %>%
+ungroup() %>%
+arrange(desc(n)) %>%
+group_by(activity, trail) %>%
+slice_max(prop=0.5, order_by=n) %>%
+filter(activity %in% c("mountain biking","(trail) running")) %>%
+ggplot()+
+geom_bar(aes(x=experience))+
+facet_grid(trail~activity)+
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 ```
 
 ```{r}
