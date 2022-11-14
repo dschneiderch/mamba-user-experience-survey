@@ -1,3 +1,6 @@
+if (!nzchar(Sys.getenv("QUARTO_PROJECT_RENDER_ALL"))) {
+  quit()
+}
 suppressPackageStartupMessages(library(tidyverse, quietly = TRUE))
 library(googlesheets4)
 library(stringr)
