@@ -9,6 +9,7 @@ title: Favorites Analysis
 suppressPackageStartupMessages(library(tidyverse))
 library(googlesheets4)
 library(stringr)
+gs4_auth(email='dschneid@gmail.com')
 Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
 fav_trails = read_sheet(Sheet, sheet="favorite_trails")
 fav_trails %>% colnames()
@@ -37,11 +38,6 @@ cleaned_fav_trails %>%
 distinct(timestamp, activity) %>%
 ggplot() + geom_bar(aes(y=activity))
 
-cleaned_fav_trails %>%
-distinct(activity, level) %>%
-group_by(activity, level) %>%
-count()
-
 ```
 
 ```{r}
@@ -62,4 +58,8 @@ cleaned_fav_trails %>%
 filter(season == "summer", level != "Beginner", activity == "hiking") %>%
 ggplot() + geom_bar(aes(y=fct_infreq(favorite_trail))) +
     facet_grid(rows=vars(activity), cols=vars(level))
+```
+
+```{r}
+
 ```
