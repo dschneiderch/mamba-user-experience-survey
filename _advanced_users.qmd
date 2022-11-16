@@ -1,0 +1,92 @@
+---
+title: Advanced level Analysis
+
+---
+
+
+
+```{r include=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+library(googlesheets4)
+library(stringr)
+gs4_auth(email='dschneid@gmail.com')
+Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
+fav_trails = read_sheet(Sheet, sheet="favorite_trails")
+
+```
+
+```{r}
+activity_levels = c("Beginner","Intermediate","Advanced")
+cleaned_fav_trails <-
+fav_trails %>%
+mutate(
+    season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
+    activity = as_factor(activity),
+        level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
+        level = factor(level, activity_levels))
+
+```
+
+
+```{r, cache=TRUE}
+suppressPackageStartupMessages(library(tidyverse))
+library(googlesheets4)
+library(stringr)
+gs4_auth(email="dschneid@gmail.com")
+Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
+experiences = read_sheet(Sheet, sheet="trail_experiences")
+
+
+```
+
+```{r, include=FALSE}
+activity_levels = c("Beginner","Intermediate","Advanced")
+cleaned_experiences <-
+experiences %>%
+mutate(
+    season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
+    activity = as_factor(activity),
+        level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
+        level = factor(level, activity_levels))
+
+```
+```{r}
+top_n_fav =
+cleaned_fav_trails %>%
+filter(activity %in% c("mountain biking", "(trail) running"), level %in% c("Intermediate","Advanced")) %>%
+select(activity, level, favorite_trail) %>%
+group_by(activity, level, favorite_trail, .drop=TRUE) %>%
+summarise(
+    n=n()) %>% 
+slice_max(n=5, order_by=n) %>%
+select(activity, favorite_trail, level)
+
+
+```
+
+```{r}
+fav_exp =
+experiences %>% 
+select(activity, trail, experience, level) %>%
+inner_join(top_n_fav, by=c("trail"="favorite_trail", "activity"="activity", "level"="level")) 
+
+group_response_rate = fav_exp %>% 
+group_by(activity, level) %>%
+summarize(
+    max_n = n()
+)
+
+fav_exp %>%
+group_by(activity, level, trail, experience) %>%
+add_count() %>% 
+left_join(group_response_rate) %>%
+mutate(exp_prop = n / max_n) %>% 
+ggplot()+
+geom_col(aes(x=trail, y=exp_prop, fill=experience), position='dodge')+
+facet_wrap(level~activity)+
+scale_fill_brewer(palette='Set1')+
+theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
+
+
+```
+
