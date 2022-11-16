@@ -1,5 +1,8 @@
 ---
 title: User Experience Analysis
+format:
+  html:
+    code-fold: true
 editor:
   render-on-save: true
 ---
@@ -100,5 +103,7 @@ group_by(activity, level, trail) %>%
 count(experience) %>%
 group_by(activity, level, experience) %>%
 summarise( max_n = max(n)) %>%
-ggplot() + geom_bar(aes(x=interaction(activity, level), y=max_n, fill=experience), position='dodge', stat='identity')+ scale_fill_brewer(palette="Set1")+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=.5))
+ggplot() +
+    geom_bar(aes(x=interaction(activity, level), y=max_n, fill=experience), position='dodge', stat='identity')+
+    scale_fill_brewer(palette="Set1")+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=.5))
 ```

@@ -1,5 +1,8 @@
 ---
 title: "mamba-user-experience-survey"
+format:
+  html:
+    code-fold: true
 ---
 
 {{< include _demographics.qmd >}}

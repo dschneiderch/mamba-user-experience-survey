@@ -1,6 +1,8 @@
 ---
 title: Frequency Analysis
-
+format:
+  html:
+    code-fold: true
 ---
 
 
