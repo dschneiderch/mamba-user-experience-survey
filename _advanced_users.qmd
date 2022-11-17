@@ -5,8 +5,6 @@ format:
     code-fold: true
 ---
 
-
-
 ```{r include=FALSE}
 suppressPackageStartupMessages(library(tidyverse))
 library(googlesheets4)
@@ -19,6 +17,7 @@ knitr::opts_chunk$set(message=FALSE, fig.width=16, fig.height=12)
 gs4_auth(email='dschneid@gmail.com')
 Sheet = "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"
 ```
+
 ```{r read_favorites, include=FALSE}
 fav_trails = read_sheet(Sheet, sheet="favorite_trails")
 
@@ -45,7 +44,6 @@ mutate(
         level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
         level = factor(level, activity_levels))
 ```
-
 
 ```{r read_trail_experiences, cache=TRUE, include=FALSE}
 experiences = read_sheet(Sheet, sheet="trail_experiences")
@@ -78,8 +76,7 @@ select(activity, favorite_trail, level)
 ```
 
 ```{r}
-fav_exp =
-experiences %>%
+fav_exp = experiences %>%
 select(activity, trail, experience, level) %>%
 inner_join(top_n_fav, by=c("trail"="favorite_trail", "activity"="activity", "level"="level"))
 
@@ -102,14 +99,13 @@ theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
 
-ggsave(plot=.Last.value, filename="experiences_of_top_n_fav_trails.png", dpi=150, width=12, height=8)
+ggsave(plot=.Last.value, filename="experiences_of_top_n_fav_trails.png", dpi=150, width=16, height=8)
 ```
 
 # Experiences of Frequented Trails
 
 ```{r}
-top_n_freq =
-cleaned_freq_trails %>%
+top_n_freq = cleaned_freq_trails %>%
 filter(activity %in% c("mountain biking", "(trail) running"), level %in% c("Intermediate","Advanced")) %>%
 select(activity, level, most_frequented_trail) %>%
 group_by(activity, level, most_frequented_trail, .drop=TRUE) %>%
@@ -122,8 +118,7 @@ select(activity, most_frequented_trail, level)
 ```
 
 ```{r}
-freq_exp =
-experiences %>%
+freq_exp = experiences %>%
 select(activity, trail, experience, level) %>%
 inner_join(top_n_freq, by=c("trail"="most_frequented_trail", "activity"="activity", "level"="level"))
 
@@ -146,6 +141,6 @@ theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
 
-ggsave(plot=.Last.value, filename="experiences_of_top_n_frequented_trails.png", dpi=150, height=8, width=12)
+ggsave(plot=.Last.value, filename="experiences_of_top_n_frequented_trails.png", dpi=150, height=8, width=16)
 
 ```
