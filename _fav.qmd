@@ -31,6 +31,8 @@ mutate(
 ```{r}
 cleaned_fav_trails %>%
 ggplot()+geom_bar(aes(y=fct_infreq(favorite_trail)))+ggtitle("Overall Favorite Trails")
+
+ggsave(plot=.Last.value, filename="overall_favorite_trails.png", dpi=150)
 ```
 
 ```{r}

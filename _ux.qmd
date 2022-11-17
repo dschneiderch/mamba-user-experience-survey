@@ -21,8 +21,7 @@ experiences = read_sheet(Sheet, sheet="trail_experiences")
 
 ```{r, include=FALSE}
 activity_levels = c("Beginner","Intermediate","Advanced")
-cleaned_experiences <-
-experiences %>%
+cleaned_experiences <- experiences %>%
 mutate(
     season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
     activity = as_factor(activity),
@@ -41,7 +40,6 @@ num_trails <- cleaned_experiences %>%
 
 num_trails$trail
 
-all_trailnames[!all_trailnames %in% num_trails$trail]
 
 
 ```
@@ -52,10 +50,8 @@ all_trailnames[!all_trailnames %in% num_trails$trail]
 ggplot(cleaned_experiences)+
 geom_bar(aes(x=experience), stat="count")+
 ggtitle('Count of experiences')
-```
 
-```{r}
-
+ggsave(plot=.Last.value, filename="count_of_experiences.png", dpi=150)
 ```
 
 ```{r}

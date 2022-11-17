@@ -102,7 +102,7 @@ theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
 
-
+ggsave(plot=.Last.value, filename="experiences_of_top_n_fav_trails.png", dpi=150, width=12, height=8)
 ```
 
 # Experiences of Frequented Trails
@@ -146,6 +146,6 @@ theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
 
-
+ggsave(plot=.Last.value, filename="experiences_of_top_n_frequented_trails.png", dpi=150, height=8, width=12)
 
 ```

@@ -3,6 +3,7 @@ if (!nzchar(Sys.getenv("QUARTO_PROJECT_RENDER_ALL"))) {
 }
 suppressPackageStartupMessages(library(tidyverse, quietly = TRUE))
 library(googlesheets4)
+library(tidyverse)
 library(stringr)
 gs4_auth(email = "dschneid@gmail.com")
 Sheet <- "https://docs.google.com/spreadsheets/d/1252VDsq9N21Zrl21zkEx0TOjXeKmOddHrwno1xhrEsI/edit?resourcekey#gid=983704671"

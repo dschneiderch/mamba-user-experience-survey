@@ -7,9 +7,6 @@ editor:
   render-on-save: false
 ---
 
-```{r}
-library(tidyverse)
-```
 
 ```{r}
 #| cache: true
@@ -57,7 +54,10 @@ select(timestamp, activity, level) %>%
 ggplot()+
 geom_bar(aes(x=activity, fill=level), position='dodge')+
 scale_fill_brewer(palette="Set3") +
+theme(axis.text.x=element_text(angle=10, hjust=1))+
 ggtitle("Count by activity and level")
+
+ggsave(plot=.Last.value, filename='response_count_by_activity_level.png', dpi=300)
 ```
 
 # What trails are represented?
