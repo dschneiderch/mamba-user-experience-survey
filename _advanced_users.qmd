@@ -52,11 +52,15 @@ activity_levels = c("Beginner","Intermediate","Advanced")
 cleaned_experiences <-
 experiences %>%
 mutate(
+    experience = as.factor(experience),
     season = case_when(activity %in% c("mountain biking", "(trail) running", "hiking") ~ "summer", TRUE ~ "winter"),
-    activity = as_factor(activity),
-        level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
-        level = factor(level, activity_levels))
+    activity = as.factor(activity),
+    level = case_when(level %in% activity_levels ~ level, TRUE ~ "Intermediate"),
+    level = factor(level, activity_levels))
 
+
+experience_colors = RColorBrewer::brewer.pal(n=9, name="Set1")
+names(experience_colors)= levels(cleaned_experiences$experience)
 ```
 
 # Experiences of Favorite Trails
@@ -76,7 +80,7 @@ select(activity, favorite_trail, level)
 ```
 
 ```{r}
-fav_exp = experiences %>%
+fav_exp = cleaned_experiences %>%
 select(activity, trail, experience, level) %>%
 inner_join(top_n_fav, by=c("trail"="favorite_trail", "activity"="activity", "level"="level"))
 
@@ -91,14 +95,16 @@ group_by(activity, level, trail, experience) %>%
 add_count() %>%
 left_join(group_response_rate) %>%
 mutate(exp_prop = n / max_n) %>%
+filter(!experience %in% c("Education","Nature")) %>%
 ggplot()+
 geom_col(aes(x=trail, y=exp_prop, fill=experience), position='dodge')+
 facet_wrap(level~activity)+
-scale_fill_brewer(palette='Set1')+
+scale_fill_brewer(palette='Set1', drop=FALSE)+
 theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
-
+```
+```{r}
 ggsave(plot=.Last.value, filename="experiences_of_top_n_fav_trails.png", dpi=150, width=16, height=8)
 ```
 
@@ -118,7 +124,7 @@ select(activity, most_frequented_trail, level)
 ```
 
 ```{r}
-freq_exp = experiences %>%
+freq_exp = cleaned_experiences %>%
 select(activity, trail, experience, level) %>%
 inner_join(top_n_freq, by=c("trail"="most_frequented_trail", "activity"="activity", "level"="level"))
 
@@ -133,10 +139,11 @@ group_by(activity, level, trail, experience) %>%
 add_count() %>%
 left_join(group_response_rate) %>%
 mutate(exp_prop = n / max_n) %>%
+# filter(!experience %in% c("Education","Nature")) %>%
 ggplot()+
 geom_col(aes(x=trail, y=exp_prop, fill=experience), position='dodge')+
 facet_wrap(level~activity)+
-scale_fill_brewer(palette='Set1')+
+scale_fill_brewer(palette='Set1', drop=FALSE)+
 theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1),
 axis.text = element_text(size=18),
 text = element_text(size=20))
